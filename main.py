@@ -9,7 +9,6 @@ from urllib.parse import parse_qs, quote, unquote, urlencode, urlparse, urlunpar
 
 import aiohttp
 
-# Расширенный список репозиториев: VLESS-PO-GRIBI + igareck + rjsxrd + обход белых списков
 SOURCES = [
     # 1. VLESS-PO-GRIBI
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/1.txt",
@@ -23,11 +22,9 @@ SOURCES = [
     # 2. igareck/vpn-configs-for-russia (проверенные VLESS Reality + белые списки)
     "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Cable.txt",
     "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-checked.txt",
     # 3. rjsxrd + профильные базы обхода белых списков
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-all.txt",
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/default/vless.txt",
-    "https://raw.githubusercontent.com/zieng2/wl/main/vless_universal.txt",
     "https://raw.githubusercontent.com/LowiKLive/BypassWhitelistRu/refs/heads/main/WhiteList-Bypass_Ru.txt",
     # 4. Глобальные агрегаторы VLESS
     "https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/refs/heads/main/Config/vless.txt",
@@ -38,11 +35,12 @@ TCP_CONCURRENCY = 200
 TCP_TIMEOUT = 2.0
 MAX_CANDIDATES_FOR_XRAY = 400
 XRAY_BATCH_SIZE = 40
-MAX_PING_MS = 3500
+MAX_PING_MS = 4000
 STRICT_US_ONLY = False
 
 UUID_RE = re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 HEX_RE = re.compile(r"^[0-9a-fA-F]+$")
+GOOGLE_LOC_RE = re.compile(r',2,1,200,"([A-Z]{3})"')
 
 VALID_FPS = {"chrome", "firefox", "safari", "ios", "android", "edge", "360", "qq", "random", "randomized"}
 VALID_ALPNS = {"h2", "http/1.1", "h3"}
@@ -59,8 +57,16 @@ RU_WHITELIST_MARKERS = (
     "wildberries", "mail.ru", "kaspersky", "sber", "tinkoff", "gosuslugi"
 )
 
-# Метки серверов, чей ВЫХОД находится внутри РФ/РБ/КНР (на них Gemini не работает)
 BAD_EXIT_REMARK_MARKERS = ("🇷🇺", "| RUS", "Russia", "Россия", "Москва", "СПб", "🇧🇾", "🇨🇳", "🇮🇷")
+BLOCKED_ISO3 = {"RUS", "BLR", "CHN", "HKG", "MAC", "IRN", "PRK", "CUB", "SYR", "AFG"}
+
+ISO3_TO_ISO2 = {
+    "USA": "US", "GBR": "GB", "NLD": "NL", "DEU": "DE", "FIN": "FI",
+    "SWE": "SE", "FRA": "FR", "POL": "PL", "EST": "EE", "LVA": "LV",
+    "LTU": "LT", "CAN": "CA", "CHE": "CH", "AUT": "AT", "ESP": "ES",
+    "ITA": "IT", "NOR": "NO", "DNK": "DK", "IRL": "IE", "CZE": "CZ",
+    "SGP": "SG", "JPN": "JP", "KOR": "KR", "TUR": "TR", "KAZ": "KZ",
+}
 
 COUNTRY_HINTS = {
     "🇺🇸": "US", "USA": "US", "United States": "US", "| US": "US", "_US": "US",
@@ -222,7 +228,6 @@ def parse_proxy_uri(uri: str, source_priority: int = 1) -> dict | None:
             if not host or not is_valid_domain_or_ip(host) or not port or not (1 <= int(port) <= 65535) or not UUID_RE.match(uuid):
                 return None
             remark = unquote(parsed.fragment)
-            # Сразу отсекаем серверы, которые явно подписаны как внутрироссийские выходные узлы
             if any(bad in remark for bad in BAD_EXIT_REMARK_MARKERS):
                 return None
 
@@ -284,7 +289,7 @@ async def fetch_sources() -> list[dict]:
     nodes = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=20)) as session:
         for url in SOURCES:
-            src_prio = 0 if any(k in url for k in ("VLESS-PO-GRIBI", "igareck", "rjsxrd", "zieng2", "LowiKLive")) else 1
+            src_prio = 0 if any(k in url for k in ("VLESS-PO-GRIBI", "igareck", "rjsxrd", "LowiKLive")) else 1
             try:
                 async with session.get(url) as resp:
                     if resp.status == 200:
@@ -335,11 +340,6 @@ def prioritize_candidates(nodes: list[dict]) -> list[dict]:
         has_explicit_foreign_flag = guessed_cc != "EU"
         is_us_or_uk = guessed_cc in ("US", "GB")
 
-        # Приоритет:
-        # 1) Зарубежные серверы (US/GB/NL/DE/FI) с Reality + обходом белых списков (как gb.ozon.ru)
-        # 2) Проверенные российские репозитории (VLESS-PO-GRIBI, igareck, rjsxrd)
-        # 3) Протокол VLESS Reality
-        # 4) США и Великобритания
         n["sort_key"] = (
             0 if (n["whitelist_sni"] and has_explicit_foreign_flag) else 1,
             n["source_prio"],
@@ -352,107 +352,98 @@ def prioritize_candidates(nodes: list[dict]) -> list[dict]:
     return filtered[:MAX_CANDIDATES_FOR_XRAY]
 
 
-async def detect_country_label(session: aiohttp.ClientSession, proxy_url: str, remark: str) -> str:
-    try:
-        async with session.get(
-            "https://1.1.1.1/cdn-cgi/trace",
-            proxy=proxy_url,
-            ssl=False,
-            timeout=aiohttp.ClientTimeout(total=4),
-        ) as resp:
-            if resp.status == 200:
-                text = await resp.text()
-                m = re.search(r"loc=([A-Z]{2})", text)
-                if m:
-                    cc = m.group(1)
-                    if cc not in ("RU", "BY", "CN", "IR", "UN"):
-                        return cc
-    except Exception:
-        pass
-    return guess_country_from_remark(remark)
-
-
 async def test_single_tunnel(node: dict, local_port: int, stats: dict) -> dict | None:
-    proxy_url = f"http://127.0.0.1:{local_port}"
-    timeout = aiohttp.ClientTimeout(total=14, connect=6)
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-    }
+    proxy_addr = f"http://127.0.0.1:{local_port}"
 
     try:
-        async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
-            # Шаг 1: Быстрая проверка связи с Google и замер чистого пинга через generate_204
-            t0 = time.monotonic()
-            async with session.get(
-                "https://www.google.com/generate_204",
-                proxy=proxy_url,
-                allow_redirects=False,
-                ssl=False,
-                timeout=aiohttp.ClientTimeout(total=7, connect=5),
-            ) as ping_resp:
-                if ping_resp.status not in (204, 200):
-                    stats["dead_tunnel"] += 1
-                    return None
-                ping_ms = int((time.monotonic() - t0) * 1000)
+        # Шаг 1: Быстрый замер чистого пинга до Google через пустой 204-ответ
+        t0 = time.monotonic()
+        proc_ping = await asyncio.create_subprocess_exec(
+            "curl", "-s", "-o", "/dev/null",
+            "-x", proxy_addr,
+            "--connect-timeout", "5",
+            "--max-time", "7",
+            "-w", "%{http_code}",
+            "https://www.google.com/generate_204",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.DEVNULL,
+        )
+        out_ping, _ = await asyncio.wait_for(proc_ping.communicate(), timeout=8)
+        ping_code = out_ping.decode("utf-8", errors="ignore").strip()
 
-            if ping_ms > MAX_PING_MS:
-                stats["dead_tunnel"] += 1
+        if ping_code not in ("204", "200"):
+            stats["dead_tunnel"] += 1
+            return None
+
+        ping_ms = int((time.monotonic() - t0) * 1000)
+        if ping_ms > MAX_PING_MS:
+            stats["dead_tunnel"] += 1
+            return None
+
+        # Шаг 2: Запрос к https://gemini.google.com/ через нативный curl
+        proc_gem = await asyncio.create_subprocess_exec(
+            "curl", "-sL",
+            "-x", proxy_addr,
+            "--connect-timeout", "5",
+            "--max-time", "10",
+            "-H", "Accept-Language: en-US,en;q=0.9",
+            "-w", "\n__CURL_META__:%{http_code}|%{url_effective}",
+            "https://gemini.google.com/",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.DEVNULL,
+        )
+        out_gem, _ = await asyncio.wait_for(proc_gem.communicate(), timeout=12)
+        raw_text = out_gem.decode("utf-8", errors="ignore")
+
+        if "__CURL_META__:" not in raw_text:
+            stats["dead_tunnel"] += 1
+            return None
+
+        html_body, meta_part = raw_text.rsplit("__CURL_META__:", 1)
+        http_code, final_url = meta_part.strip().split("|", 1)
+        final_url_low = final_url.lower()
+        stats["alive_tunnel"] += 1
+
+        # 1. Отсекаем явные редиректы на блокировку региона или капчу Google
+        bad_url_markers = (
+            "/faq",
+            "google.com/sorry",
+            "policies.google.com",
+            "support.google.com",
+            "unsupported",
+        )
+        if http_code != "200" or any(b in final_url_low for b in bad_url_markers):
+            print(f"       [-] Блок по URL/коду ({http_code} -> {final_url[:60]}): {node['host']}")
+            stats["gemini_blocked"] += 1
+            return None
+
+        # 2. Отсекаем явный флаг регионального бана внутри HTML (если Google прислал полную страницу)
+        if '"45631641":false' in html_body or "[45631641,null,false" in html_body:
+            print(f"       [-] Блок по флагу 45631641=false: {node['host']}")
+            stats["gemini_blocked"] += 1
+            return None
+
+        # 3. Проверяем 3-буквенный код страны Google (,2,1,200,"GBR"), если он присутствует в ответе
+        loc_match = GOOGLE_LOC_RE.search(html_body)
+        if loc_match:
+            iso3 = loc_match.group(1)
+            if iso3 in BLOCKED_ISO3:
+                print(f"       [-] Блок по гео-метке Google ({iso3}): {node['host']}")
+                stats["gemini_blocked"] += 1
                 return None
+            country = ISO3_TO_ISO2.get(iso3, guess_country_from_remark(node["remark"]))
+        else:
+            country = guess_country_from_remark(node["remark"])
 
-            # Шаг 2: Проверка главной страницы https://gemini.google.com/ (полное чтение HTML)
-            async with session.get(
-                "https://gemini.google.com/",
-                proxy=proxy_url,
-                allow_redirects=True,
-                ssl=False,
-            ) as resp:
-                final_url = str(resp.url).lower()
-                stats["alive_tunnel"] += 1
-                full_html = await resp.text(errors="ignore")
+        if STRICT_US_ONLY and country != "US":
+            return None
 
-                # Проверка 1: Редирект на страницу заглушки/капчи
-                bad_url_markers = (
-                    "/faq",
-                    "google.com/sorry",
-                    "policies.google.com",
-                    "support.google.com",
-                    "unsupported",
-                )
-                if resp.status != 200 or any(b in final_url for b in bad_url_markers):
-                    stats["gemini_blocked"] += 1
-                    return None
+        node["exit_country"] = country
+        node["gemini_ms"] = ping_ms
+        stats["gemini_ok"] += 1
+        print(f"       [✓] GEMINI OK: {node['host']}:{node['port']} ({country}) | {ping_ms}ms | {node['remark'][:45]}")
+        return node
 
-                # Проверка 2: Явный флаг блокировки региона внутри конфигурации Google (45631641 = false)
-                if '"45631641":false' in full_html or "[45631641,null,false" in full_html:
-                    stats["gemini_blocked"] += 1
-                    return None
-
-                if "isn't currently supported in your country" in full_html or "currently not supported in your country" in full_html:
-                    stats["gemini_blocked"] += 1
-                    return None
-
-                # Проверка 3: Наличие флага разблокировки 45631641=true или интерфейса BardChatUi / WIZ_global_data
-                is_unlocked = (
-                    '"45631641":true' in full_html
-                    or "[45631641,null,true" in full_html
-                    or "BardChatUi" in full_html
-                    or "WIZ_global_data" in full_html
-                )
-                if not is_unlocked:
-                    stats["gemini_blocked"] += 1
-                    return None
-
-            country = await detect_country_label(session, proxy_url, node["remark"])
-            if STRICT_US_ONLY and country != "US":
-                return None
-
-            node["exit_country"] = country
-            node["gemini_ms"] = ping_ms
-            stats["gemini_ok"] += 1
-            print(f"       [✓] НАЙДЕН РАБОЧИЙ: {node['host']}:{node['port']} ({country}) | Пинг: {ping_ms}ms | {node['remark'][:45]}")
-            return node
     except Exception:
         stats["dead_tunnel"] += 1
         return None
@@ -461,10 +452,8 @@ async def test_single_tunnel(node: dict, local_port: int, stats: dict) -> dict |
 async def run_xray_batch(batch: list[dict], base_port: int = 10000) -> list[dict]:
     current_batch = list(batch)
 
-    for _ in range(10):
-        if not current_batch:
-            return []
-
+    # Удаляем битые конфиги до тех пор, пока пачка не запустится
+    while current_batch:
         inbounds, outbounds, rules = [], [], []
         for idx, node in enumerate(current_batch):
             port = base_port + idx
@@ -485,7 +474,7 @@ async def run_xray_batch(batch: list[dict], base_port: int = 10000) -> list[dict
             "log": {"loglevel": "none"},
             "inbounds": inbounds,
             "outbounds": outbounds,
-            "routing": {"domainStrategy": "IPIfNonMatch", "rules": rules},
+            "routing": {"domainStrategy": "AsIs", "rules": rules},
         }
         with open("xray_temp_config.json", "w", encoding="utf-8") as f:
             json.dump(cfg, f)
@@ -495,7 +484,7 @@ async def run_xray_batch(batch: list[dict], base_port: int = 10000) -> list[dict
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(0.6)
 
         if proc.poll() is None:
             stats = {"alive_tunnel": 0, "dead_tunnel": 0, "gemini_blocked": 0, "gemini_ok": 0}
