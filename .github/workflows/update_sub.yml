@@ -1,0 +1,47 @@
+name: Update Gemini VLESS Subscription
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # Автозапуск каждые 3 часа
+  workflow_dispatch:      # Ручной запуск по кнопке в интерфейсе GitHub
+
+permissions:
+  contents: write         # Разрешаем workflow сохранять обновленный список в репозиторий
+
+jobs:
+  build-subscription:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download and Install Xray-core
+        run: |
+          curl -L -o xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
+          unzip -q xray.zip xray geoip.dat geosite.dat
+          sudo mv xray /usr/local/bin/xray
+          sudo chmod +x /usr/local/bin/xray
+          sudo mkdir -p /usr/local/share/xray
+          sudo mv geoip.dat geosite.dat /usr/local/share/xray/
+
+      - name: Run VLESS & Gemini Validator
+        run: python main.py
+
+      - name: Commit and Push updated subscription
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add sub.txt sub_base64.txt
+          git diff --staged --quiet || git commit -m "Auto-update Gemini working servers"
+          git push
