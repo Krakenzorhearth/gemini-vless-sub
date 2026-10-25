@@ -8,11 +8,9 @@ import time
 from urllib.parse import parse_qs, quote, unquote, urlencode, urlparse, urlunparse
 
 import aiohttp
-from aiohttp_socks import ProxyConnector
 
-# Расширенный список репозиториев: VLESS-PO-GRIBI + rjsxrd + профильные VLESS-агрегаторы
+# Источники: VLESS-PO-GRIBI + rjsxrd (обход белых списков РФ) + глобальные VLESS-базы
 SOURCES = [
-    # 1. Репозиторий VLESS-PO-GRIBI (основные подписки)
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/1.txt",
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/2.txt",
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/3.txt",
@@ -21,10 +19,8 @@ SOURCES = [
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/6.txt",
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/7.txt",
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/8.txt",
-    # 2. Репозиторий rjsxrd (обход белых списков РФ + проверенные VLESS)
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-all.txt",
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/default/vless.txt",
-    # 3. Дополнительные крупные агрегаторы VLESS-конфигов
     "https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/refs/heads/main/Config/vless.txt",
     "https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/Splitted-By-Protocol/vless.txt",
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/vless_configs.txt",
@@ -35,19 +31,14 @@ TCP_CONCURRENCY = 200
 TCP_TIMEOUT = 2.0
 MAX_CANDIDATES_FOR_XRAY = 350
 XRAY_BATCH_SIZE = 50
-MAX_PING_MS = 4000
-STRICT_US_ONLY = False  # False: США на 1 месте + Великобритания/Европа следом
+MAX_PING_MS = 4500
+STRICT_US_ONLY = False
 
 UUID_RE = re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 HEX_RE = re.compile(r"^[0-9a-fA-F]+$")
 
 VALID_FPS = {"chrome", "firefox", "safari", "ios", "android", "edge", "360", "qq", "random", "randomized"}
 VALID_ALPNS = {"h2", "http/1.1", "h3"}
-SUPPORTED_SS_CIPHERS = {
-    "aes-128-gcm", "aes-256-gcm", "chacha20-poly1305",
-    "chacha20-ietf-poly1305", "2022-blake3-aes-128-gcm",
-    "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305"
-}
 
 CF_NETS = [
     ipaddress.ip_network("104.16.0.0/12"),
@@ -60,6 +51,19 @@ RU_WHITELIST_MARKERS = (
     ".ru", "ozon", "yandex", "vk.com", "userapi", "wb.ru",
     "wildberries", "mail.ru", "kaspersky", "sber", "tinkoff", "gosuslugi"
 )
+
+COUNTRY_HINTS = {
+    "🇺🇸": "US", "USA": "US", "US": "US", "United States": "US",
+    "🇬🇧": "GB", "GBR": "GB", "UK": "GB", "英国": "GB",
+    "🇳🇱": "NL", "NLD": "NL", "NL": "NL",
+    "🇩🇪": "DE", "DEU": "DE", "DE": "DE",
+    "🇫🇮": "FI", "FIN": "FI", "FI": "FI",
+    "🇸🇪": "SE", "SWE": "SE", "SE": "SE",
+    "🇫🇷": "FR", "FRA": "FR", "FR": "FR",
+    "🇵🇱": "PL", "POL": "PL", "PL": "PL",
+    "🇪🇪": "EE", "EST": "EE", "EE": "EE",
+    "🇱🇻": "LV", "LVA": "LV", "LV": "LV",
+}
 
 
 def is_cloudflare_ip(ip_str: str) -> bool:
@@ -99,6 +103,13 @@ def is_valid_domain_or_ip(val: str) -> bool:
     if not val or len(val) > 253 or " " in val:
         return False
     return bool(re.match(r"^[A-Za-z0-9.-]+$", val))
+
+
+def guess_country_from_remark(remark: str) -> str:
+    for marker, cc in COUNTRY_HINTS.items():
+        if marker in remark:
+            return cc
+    return "EU"
 
 
 def parse_stream_settings(params: dict, default_host: str) -> dict | None:
@@ -284,8 +295,7 @@ def rename_uri(node: dict, new_remark: str) -> str:
 async def fetch_sources() -> list[dict]:
     nodes = {}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=20)) as session:
-        for idx, url in enumerate(SOURCES):
-            # Приоритет 0 для VLESS-PO-GRIBI и rjsxrd, 1 для остальных глобальных баз
+        for url in SOURCES:
             src_prio = 0 if ("VLESS-PO-GRIBI" in url or "rjsxrd" in url) else 1
             try:
                 async with session.get(url) as resp:
@@ -329,19 +339,12 @@ async def check_tcp(node: dict, sem: asyncio.Semaphore) -> dict | None:
 
 
 def prioritize_candidates(nodes: list[dict]) -> list[dict]:
-    # Отсеиваем фейковые Anycast IP Cloudflare, но НЕ отсеиваем серверы по входному GeoIP,
-    # так как лучшие серверы для РФ часто имеют каскадный вход или RIPE-регистрацию хостера в РФ!
     filtered = [n for n in nodes if not is_cloudflare_ip(n.get("ip", ""))]
     print(f"[*] После отсева пустышек Cloudflare осталось: {len(filtered)} серверов")
 
-    us_keywords = ("US", "USA", "🇺🇸", "United States", "GBR", "🇬🇧", "NL", "🇳🇱", "DE", "🇩🇪")
+    good_keywords = ("US", "USA", "🇺🇸", "United States", "GBR", "🇬🇧", "NL", "🇳🇱", "DE", "🇩🇪", "🇫🇮")
     for n in filtered:
-        has_good_tag = any(k.lower() in n["remark"].lower() for k in us_keywords)
-        # Сортировка кандидатов:
-        # 1) Reality с доменом из белых списков РФ (ozon.ru, vk.com и т.д.)
-        # 2) Проверенные репозитории (VLESS-PO-GRIBI / rjsxrd)
-        # 3) Протокол VLESS Reality
-        # 4) Метка США/Европы и минимальный пинг
+        has_good_tag = any(k.lower() in n["remark"].lower() for k in good_keywords)
         n["sort_key"] = (
             0 if n["whitelist_sni"] else 1,
             n["source_prio"],
@@ -354,74 +357,62 @@ def prioritize_candidates(nodes: list[dict]) -> list[dict]:
     return filtered[:MAX_CANDIDATES_FOR_XRAY]
 
 
-async def get_exit_country(session: aiohttp.ClientSession) -> str | None:
-    # Способ 1: Прямой IP Cloudflare 1.1.1.1 (не режется WAF, в отличие от www.cloudflare.com)
+async def detect_country_label(session: aiohttp.ClientSession, proxy_url: str, remark: str) -> str:
     try:
-        async with session.get("https://1.1.1.1/cdn-cgi/trace", ssl=False, timeout=aiohttp.ClientTimeout(total=6)) as resp:
+        async with session.get(
+            "https://1.1.1.1/cdn-cgi/trace",
+            proxy=proxy_url,
+            ssl=False,
+            timeout=aiohttp.ClientTimeout(total=4),
+        ) as resp:
             if resp.status == 200:
                 text = await resp.text()
                 m = re.search(r"loc=([A-Z]{2})", text)
                 if m:
-                    return m.group(1)
+                    cc = m.group(1)
+                    # Если Cloudflare видит RU из-за старой записи RIPE (как у 45.151.71.142) или сплит-роутинга,
+                    # берем страну выхода из метки сервера (например, GB)
+                    if cc not in ("RU", "BY", "CN", "IR", "UN"):
+                        return cc
     except Exception:
         pass
-
-    # Способ 2 (Резервный): ip-api внутри туннеля
-    try:
-        async with session.get("http://ip-api.com/json/?fields=countryCode", timeout=aiohttp.ClientTimeout(total=6)) as resp:
-            if resp.status == 200:
-                data = await resp.json()
-                cc = data.get("countryCode")
-                if cc:
-                    return cc
-    except Exception:
-        pass
-
-    return None
+    return guess_country_from_remark(remark)
 
 
 async def test_single_tunnel(node: dict, local_port: int, stats: dict) -> dict | None:
-    proxy_url = f"socks5://127.0.0.1:{local_port}"
-    connector = ProxyConnector.from_url(proxy_url, rdns=True)
+    proxy_url = f"http://127.0.0.1:{local_port}"
     timeout = aiohttp.ClientTimeout(total=12, connect=6)
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
     }
 
     try:
-        async with aiohttp.ClientSession(connector=connector, timeout=timeout, headers=headers) as session:
-            # 1. Проверяем, работает ли туннель и какая у него реальная страна ВЫХОДА
-            country = await get_exit_country(session)
-            if not country:
-                stats["dead_tunnel"] += 1
-                return None
-
-            stats["alive_tunnel"] += 1
-
-            if STRICT_US_ONLY and country != "US":
-                stats["geo_filtered"] += 1
-                return None
-            if country in ("RU", "BY", "CN", "HK", "IR", "KP", "SY", "CU"):
-                stats["geo_filtered"] += 1
-                return None
-
-            # 2. Проверяем доступность Gemini (читаем только первые 32 КБ, не скачивая все 2 МБ страницы)
+        async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
+            # 1. Прямая проверка https://gemini.google.com/app через HTTP-прокси Xray
             t0 = time.monotonic()
-            async with session.get("https://gemini.google.com/app", allow_redirects=True, ssl=False) as resp:
+            async with session.get(
+                "https://gemini.google.com/app",
+                proxy=proxy_url,
+                allow_redirects=True,
+                ssl=False,
+            ) as resp:
                 ping_ms = int((time.monotonic() - t0) * 1000)
                 final_url = str(resp.url).lower()
+                stats["alive_tunnel"] += 1
 
-                if resp.status not in (200, 302) or ping_ms > MAX_PING_MS:
+                if resp.status != 200 or ping_ms > MAX_PING_MS:
                     stats["gemini_blocked"] += 1
                     return None
 
-                # Если Google перенаправил на страницу капчи или региональной заглушки
+                # В заблокированных странах (РФ/РБ/КНР) Google перенаправляет с /app на /faq или страницу справки
                 bad_url_markers = (
+                    "/faq",
                     "google.com/sorry",
-                    "policies.google.com/terms/location",
-                    "support.google.com/gemini",
-                    "gemini.google.com/faq",
+                    "policies.google.com",
+                    "support.google.com",
+                    "unsupported",
                 )
                 if any(b in final_url for b in bad_url_markers):
                     stats["gemini_blocked"] += 1
@@ -430,15 +421,19 @@ async def test_single_tunnel(node: dict, local_port: int, stats: dict) -> dict |
                 chunk = await resp.content.read(32768)
                 head_text = chunk.decode("utf-8", errors="ignore")
 
-                # Если открылась страница с WIZ_global_data или редирект на логин Google аккаунта — доступ открыт
-                if "WIZ_global_data" in head_text or "accounts.google.com" in final_url or "gemini.google.com" in final_url:
-                    node["exit_country"] = country
-                    node["gemini_ms"] = ping_ms
-                    stats["gemini_ok"] += 1
-                    return node
+                if "WIZ_global_data" not in head_text and "gemini" not in head_text.lower():
+                    stats["gemini_blocked"] += 1
+                    return None
 
-                stats["gemini_blocked"] += 1
+            # 2. Туннель гарантированно открывает Gemini — определяем страну для красивого тега
+            country = await detect_country_label(session, proxy_url, node["remark"])
+            if STRICT_US_ONLY and country != "US":
                 return None
+
+            node["exit_country"] = country
+            node["gemini_ms"] = ping_ms
+            stats["gemini_ok"] += 1
+            return node
     except Exception:
         stats["dead_tunnel"] += 1
         return None
@@ -454,12 +449,13 @@ async def run_xray_batch(batch: list[dict], base_port: int = 10000) -> list[dict
         inbounds, outbounds, rules = [], [], []
         for idx, node in enumerate(current_batch):
             port = base_port + idx
+            # Используем нативный HTTP-прокси Xray (как порт 10809 в твоем рабочем JSON)
             inbounds.append({
                 "tag": f"in_{idx}",
                 "port": port,
                 "listen": "127.0.0.1",
-                "protocol": "socks",
-                "settings": {"auth": "noauth", "udp": True, "userLevel": 8},
+                "protocol": "http",
+                "settings": {"userLevel": 8},
                 "sniffing": {"destOverride": ["http", "tls", "quic"], "enabled": True},
             })
             ob = dict(node["outbound"])
@@ -471,28 +467,27 @@ async def run_xray_batch(batch: list[dict], base_port: int = 10000) -> list[dict
             "log": {"loglevel": "none"},
             "inbounds": inbounds,
             "outbounds": outbounds,
-            "routing": {"domainStrategy": "AsIs", "rules": rules},
+            "routing": {"domainStrategy": "IPIfNonMatch", "rules": rules},
         }
         with open("xray_temp_config.json", "w", encoding="utf-8") as f:
             json.dump(cfg, f)
 
-        # Перехватываем stdout + stderr вместе, так как Xray пишет ошибки конфига в stdout
         proc = subprocess.Popen(
             ["xray", "run", "-c", "xray_temp_config.json"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
-        await asyncio.sleep(0.9)
+        await asyncio.sleep(1.0)
 
         if proc.poll() is None:
-            stats = {"alive_tunnel": 0, "dead_tunnel": 0, "geo_filtered": 0, "gemini_blocked": 0, "gemini_ok": 0}
+            stats = {"alive_tunnel": 0, "dead_tunnel": 0, "gemini_blocked": 0, "gemini_ok": 0}
             try:
                 tasks = [test_single_tunnel(node, base_port + idx, stats) for idx, node in enumerate(current_batch)]
                 results = await asyncio.gather(*tasks)
                 print(
-                    f"       Статистика пачки: туннелей поднялось={stats['alive_tunnel']} | "
-                    f"отсеяно по гео (RU/CN)={stats['geo_filtered']} | "
-                    f"блок Google={stats['gemini_blocked']} | "
+                    f"       Статистика пачки: ответили={stats['alive_tunnel']} | "
+                    f"блок региона/капча={stats['gemini_blocked']} | "
+                    f"таймаут={stats['dead_tunnel']} | "
                     f"GEMINI OK={stats['gemini_ok']}"
                 )
                 return [r for r in results if r is not None]
@@ -510,8 +505,6 @@ async def run_xray_batch(batch: list[dict], base_port: int = 10000) -> list[dict
                 print(f"    [!] Исключен сбойный конфиг out_{bad_idx}, перезапуск пачки...")
                 current_batch.pop(bad_idx)
             elif len(current_batch) > 1:
-                # Если Xray не указал номер тега, делим пачку пополам, чтобы не терять рабочие серверы
-                print(f"    [!] Ошибка конфига в пачке ({err_text.strip()[:120]}), делим пачку пополам...")
                 mid = len(current_batch) // 2
                 res1 = await run_xray_batch(current_batch[:mid], base_port)
                 res2 = await run_xray_batch(current_batch[mid:], base_port + mid)
@@ -544,10 +537,6 @@ async def main():
         passed = await run_xray_batch(batch)
         working_nodes.extend(passed)
 
-    # Сортировка:
-    # 1) Серверы с маскировкой под белые списки РФ (WL-RU) и США (US)
-    # 2) Великобритания и Европа (GB, NL, DE, FI, SE, FR)
-    # 3) Минимальный пинг до Gemini
     working_nodes.sort(key=lambda x: (
         0 if x["whitelist_sni"] else 1,
         0 if x["exit_country"] == "US" else (1 if x["exit_country"] in ("GB", "NL", "DE", "FI", "SE", "FR") else 2),
