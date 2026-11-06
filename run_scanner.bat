@@ -3,7 +3,7 @@ cd /d "%~dp0"
 
 :: Запускаем скрипт и перенаправляем весь вывод (ошибки и успехи) в файл log.txt в этой же папке
 echo [%DATE% %TIME%] Запуск сканирования... >> scan_log.txt
-python main_2.py >> scan_log.txt 2>&1
+"C:\Users\Nitro\AppData\Local\Programs\Python\Python314\python.exe" main_2.py >> scan_log.txt 2>&1
 
 git stash >> scan_log.txt 2>&1
 git pull origin main >> scan_log.txt 2>&1
