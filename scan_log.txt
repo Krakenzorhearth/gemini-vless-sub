@@ -222,4 +222,18 @@ Changes not staged for commit:
 	modified:   scan_log.txt
 
 no changes added to commit (use "git add" and/or "git commit -a")
+^C[07.11.2026  2:24:57,80] ╟ряєёъ ёърэшЁютрэш ... 
+Системе не удается найти указанный путь.
+From https://github.com/Krakenzorhearth/gemini-vless-sub
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   scan_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
 ^C
