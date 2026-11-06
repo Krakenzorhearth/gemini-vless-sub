@@ -578,3 +578,7 @@ async def main():
         f.write(plain_text)
     with open("sub_base64.txt", "w", encoding="utf-8") as f:
         f.write(b64_text)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
