@@ -1,17 +1,14 @@
 @echo off
 cd /d "%~dp0"
 
-:: 1. Запуск сканера
-python main_2.py
+:: Запускаем скрипт и перенаправляем весь вывод (ошибки и успехи) в файл log.txt в этой же папке
+echo [%DATE% %TIME%] Запуск сканирования... >> scan_log.txt
+python main_2.py >> scan_log.txt 2>&1
 
-:: 2. Обновление локальной базы с GitHub
-git pull --rebase origin main
+git stash >> scan_log.txt 2>&1
+git pull origin main >> scan_log.txt 2>&1
+git add sub.txt sub_base64.txt >> scan_log.txt 2>&1
+git diff-index --quiet HEAD || git commit -m "Auto-update Gemini working servers (Local Scan)" >> scan_log.txt 2>&1
+git push origin main >> scan_log.txt 2>&1
 
-:: 3. Добавление измененных файлов в Git
-git add sub.txt sub_base64.txt
-
-:: 4. Создание коммита (только если файлы изменились)
-git diff-index --quiet HEAD || git commit -m "Auto-update Gemini working servers (Local Scan)"
-
-:: 5. Отправка изменений на сервер
-git push origin main
+echo [%DATE% %TIME%] Завершено. >> scan_log.txt
