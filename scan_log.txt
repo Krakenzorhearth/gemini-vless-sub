@@ -133,3 +133,78 @@ To add an exception for this directory, call:
 
 	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
 [07.11.2026  1:37:36,55] –ó–∞–≤–µ—Ä—à–µ–Ω–æ. 
+[07.11.2026  1:42:55,31] –ó–∞–ø—É—Å–∫ —Å–∫–∞–Ω–∏—Ä–æ–≤–∞–Ω–∏—è... 
+[*] 1. —·Ó ÍÎ˛˜ÂÈ ËÁ ÔÓ‚ÂÂÌÌ˚ı ËÒÚÓ˜ÌËÍÓ‚...
+[+] —Ó·‡ÌÓ ÛÌËÍ‡Î¸Ì˚ı Reality-ÒÂ‚ÂÓ‚: 326
+[*] 2. ¡˚ÒÚ˚È TCP-ÔËÌ„ ÒÂ‚ÂÓ‚ ˜ÂÂÁ ‚‡¯Â„Ó ÔÓ‚‡È‰Â‡...
+[+] ŒÚ‚ÂÚËÎË ÔÓ TCP: 140 ÒÂ‚ÂÓ‚
+[*] 3. œÓ‚ÂÍ‡ Í‡Ì‰Ë‰‡ÚÓ‚ ˜ÂÂÁ Xray + Ì‡ÚË‚Ì˚È curl (Ú‡ÈÏ‡ÛÚ: 5 ÏËÌÛÚ)...
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 1..15 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 0)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1081ms | WL-RU): 82.148.255.201 (GB)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (481ms | WL-RU): 82.148.252.219 (GB)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1204ms | WL-RU): 188.225.78.228 (DE)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 16..30 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 3)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2583ms | WL-RU): 177.1.183.115 (FI)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2123ms | WL-RU): ru-gr1.fluxnode777.ru (GB)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1165ms | WL-RU): plov.plus-hit.ru (EU)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 31..45 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 6)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (738ms): 50.7.227.77 (NL)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1157ms): 82.148.253.27 (GB)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (407ms): gembeforeshoping.space (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (601ms): prime.jarbook.net (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1725ms): at-87-10.cdn-lab.online (GB)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 46..60 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 11)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (778ms): 23.95.75.107 (DE)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1125ms): fduknew.titun.su (NL)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1559ms): pl-balancer.peregrine-sub.net (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1149ms): 23.95.73.90 (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2436ms): 9.247.54.223 (US)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 61..75 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 16)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1003ms): usa5.un1.cloud (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1571ms): 81.177.140.23 (DE)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2285ms): 2.31.39.87 (DE)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (424ms): 50.7.95.226 (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (465ms): 84.32.101.116 (NL)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 76..90 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 21)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (369ms): 177.202.74.60 (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (810ms): 84.32.101.116 (NL)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (469ms): 78.17.215.170 (NL)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 91..105 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 24)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2463ms): 13.143.167.154 (PL)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (488ms): swdnode.barnikle1.me (SE)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (549ms): 84.32.151.159 (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (653ms): 212.193.0.105 (EU)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 106..120 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 28)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1680ms): 217.60.182.162 (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (592ms): app26.betust.net (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (699ms): ru.starkclaude.top (US)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2380ms): ea0gmd8p.mtrxnet.click (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (508ms): prvtch.titun.su (NL)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 121..135 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 33)...
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (856ms): snow.betust.net (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (2466ms): ultra-vector-y3jwzsth.expresshost.cloud (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1184ms): usa4.un1.cloud (EU)
+  [+] Õ¿…ƒ≈Õ –¿¡Œ◊»… (1402ms): 62981et.us11.h1clayd.click (US)
+    “ÂÒÚËÛÂÚÒˇ Ô‡˜Í‡ 136..140 (Õ‡È‰ÂÌÓ ‡·Ó˜Ëı: 37)...
+
+[+] √Œ“Œ¬Œ Á‡ 410 ÒÂÍ! —Óı‡ÌÂÌÓ 35 ‡·Ó˜Ëı ÒÂ‚ÂÓ‚ ‚ sub.txt Ë sub_base64.txt
+warning: in the working copy of 'scan_log.txt', LF will be replaced by CRLF the next time Git touches it
+Saved working directory and index state WIP on main: 2768c86 Create scan_log.txt
+error: unable to unlink old 'scan_log.txt': Invalid argument
+fatal: Could not reset index file to revision 'HEAD'.
+From https://github.com/Krakenzorhearth/gemini-vless-sub
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: unable to auto-detect email address (got '–°–ò–°–¢–ï–ú–ê@DESKTOP-P2QKHO7.(none)')
