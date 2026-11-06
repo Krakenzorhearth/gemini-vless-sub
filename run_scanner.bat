@@ -1,14 +1,15 @@
 @echo off
 cd /d "%~dp0"
 
-echo [%DATE% %TIME%] Ð—Ð°Ð¿ÑƒÑÐº ÑÐºÐ°Ð½Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ... >> scan_log.txt
+echo [%DATE% %TIME%] Çàïóñê ñêàíèðîâàíèÿ... >> scan_log.txt
 
+:: Çàïóñê ñêàíåðà ñ àáñîëþòíûì ïóòåì ê Python
 "C:\Users\Nitro\AppData\Local\Programs\Python\Python311\python.exe" main_2.py >> scan_log.txt 2>&1
 
-:: Ð¡ÐºÐ°Ñ‡Ð¸Ð²Ð°ÐµÐ¼ ÑÐ²ÐµÐ¶Ð¸Ðµ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ Ð±ÐµÐ· Ð·Ð°Ñ‚Ð¸Ñ€Ð°Ð½Ð¸Ñ Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… Ñ„Ð°Ð¹Ð»Ð¾Ð² sub.txt
+:: Ñèíõðîíèçàöèÿ è îòïðàâêà òîëüêî ôàéëîâ ïîäïèñîê
 git pull origin main >> scan_log.txt 2>&1
 git add sub.txt sub_base64.txt >> scan_log.txt 2>&1
 git diff-index --quiet HEAD || git commit -m "Auto-update Gemini working servers (Local Scan)" >> scan_log.txt 2>&1
 git push origin main >> scan_log.txt 2>&1
 
-echo [%DATE% %TIME%] Ð—Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾. >> scan_log.txt
+echo [%DATE% %TIME%] Çàâåðøåíî. >> scan_log.txt
