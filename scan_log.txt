@@ -1,0 +1,135 @@
+[07.11.2026  1:24:17,30] Р—Р°РїСѓСЃРє СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ... 
+"python" ­Ґ пў«пҐвбп ў­гваҐ­­Ґ© Ё«Ё ў­Ґи­Ґ©
+Є®¬ ­¤®©, ЁбЇ®«­пҐ¬®© Їа®Ја ¬¬®© Ё«Ё Ї ЄҐв­л¬ д ©«®¬.
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+[07.11.2026  1:24:18,28] Р—Р°РІРµСЂС€РµРЅРѕ. 
+[07.11.2026  1:31:11,66] Р—Р°РїСѓСЃРє СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ... 
+[*] 1. Сбор ключей из проверенных источников...
+[+] Собрано уникальных Reality-серверов: 326
+[*] 2. Быстрый TCP-пинг серверов через вашего провайдера...
+[+] Ответили по TCP: 138 серверов
+[*] 3. Проверка кандидатов через Xray + нативный curl (таймаут: 5 минут)...
+    Тестируется пачка 1..15 (Найдено рабочих: 0)...
+  [+] НАЙДЕН РАБОЧИЙ (816ms | WL-RU): 82.148.255.201 (GB)
+  [+] НАЙДЕН РАБОЧИЙ (506ms | WL-RU): 82.148.252.219 (GB)
+  [+] НАЙДЕН РАБОЧИЙ (1091ms | WL-RU): 188.225.78.228 (DE)
+    Тестируется пачка 16..30 (Найдено рабочих: 3)...
+  [+] НАЙДЕН РАБОЧИЙ (1190ms | WL-RU): rapira-dof.whitenw.net (EU)
+  [+] НАЙДЕН РАБОЧИЙ (1250ms | WL-RU): 177.1.183.115 (FI)
+  [+] НАЙДЕН РАБОЧИЙ (948ms | WL-RU): plov.plus-hit.ru (EU)
+  [+] НАЙДЕН РАБОЧИЙ (1271ms | WL-RU): ru-gr1.fluxnode777.ru (GB)
+    Тестируется пачка 31..45 (Найдено рабочих: 7)...
+  [+] НАЙДЕН РАБОЧИЙ (1017ms): 50.7.227.77 (NL)
+  [+] НАЙДЕН РАБОЧИЙ (862ms): gembeforeshoping.space (US)
+  [+] НАЙДЕН РАБОЧИЙ (824ms): 23.95.75.107 (US)
+    Тестируется пачка 46..60 (Найдено рабочих: 10)...
+  [+] НАЙДЕН РАБОЧИЙ (553ms): fduknew.titun.su (NL)
+  [+] НАЙДЕН РАБОЧИЙ (2221ms): 9.247.54.223 (US)
+  [+] НАЙДЕН РАБОЧИЙ (1219ms): 107.175.82.43 (DE)
+  [+] НАЙДЕН РАБОЧИЙ (2372ms): usa5.un1.cloud (US)
+    Тестируется пачка 61..75 (Найдено рабочих: 14)...
+  [+] НАЙДЕН РАБОЧИЙ (1100ms): 81.177.140.23 (DE)
+  [+] НАЙДЕН РАБОЧИЙ (384ms): 177.202.74.60 (US)
+  [+] НАЙДЕН РАБОЧИЙ (404ms): 50.7.193.133 (US)
+    Тестируется пачка 76..90 (Найдено рабочих: 17)...
+  [+] НАЙДЕН РАБОЧИЙ (442ms): 78.17.215.170 (NL)
+  [+] НАЙДЕН РАБОЧИЙ (596ms): 84.32.101.116 (NL)
+  [+] НАЙДЕН РАБОЧИЙ (385ms): 50.7.95.226 (US)
+  [+] НАЙДЕН РАБОЧИЙ (480ms): 84.32.101.116 (NL)
+  [+] НАЙДЕН РАБОЧИЙ (625ms): 84.32.151.159 (US)
+    Тестируется пачка 91..105 (Найдено рабочих: 22)...
+  [+] НАЙДЕН РАБОЧИЙ (1857ms): 13.143.167.154 (PL)
+  [+] НАЙДЕН РАБОЧИЙ (2284ms): 2.31.39.87 (DE)
+    Тестируется пачка 106..120 (Найдено рабочих: 24)...
+  [+] НАЙДЕН РАБОЧИЙ (447ms): swdnode.barnikle1.me (SE)
+  [+] НАЙДЕН РАБОЧИЙ (2777ms): 31.59.83.4 (EU)
+  [+] НАЙДЕН РАБОЧИЙ (612ms): ru.starkclaude.top (US)
+  [+] НАЙДЕН РАБОЧИЙ (594ms): app26.betust.net (EU)
+    Тестируется пачка 121..135 (Найдено рабочих: 28)...
+  [+] НАЙДЕН РАБОЧИЙ (683ms): ea0gmd8p.mtrxnet.click (DE)
+  [+] НАЙДЕН РАБОЧИЙ (779ms): snow.betust.net (EU)
+  [+] НАЙДЕН РАБОЧИЙ (844ms): usa6.un1.cloud (DE)
+    Тестируется пачка 136..138 (Найдено рабочих: 31)...
+  [+] НАЙДЕН РАБОЧИЙ (978ms): 62981et.us11.h1clayd.click (US)
+
+[+] ГОТОВО за 381 сек! Сохранено 32 рабочих серверов в sub.txt и sub_base64.txt
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+fatal: detected dubious ownership in repository at 'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub'
+'C:/Users/Nitro/Documents/GitHub/gemini-vless-sub' is owned by:
+	DESKTOP-P2QKHO7/Nitro (S-1-5-21-2399437152-133542997-2087490521-1002)
+but the current user is:
+	NT AUTHORITY/СИСТЕМА (S-1-5-18)
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory C:/Users/Nitro/Documents/GitHub/gemini-vless-sub
+[07.11.2026  1:37:36,55] Р—Р°РІРµСЂС€РµРЅРѕ. 
