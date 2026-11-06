@@ -15,4 +15,3 @@ git diff-index --quiet HEAD || git commit -m "Auto-update Gemini working servers
 
 :: 5. Отправка изменений на сервер
 git push origin main
-pause
