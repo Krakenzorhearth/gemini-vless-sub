@@ -1,5 +1,2 @@
 #profile-title: 🚀 Gemini VLESS Auto
 #profile-update-interval: 3
-vless://50a87e21-f0e2-4b53-a787-91adfe748f63@48.102.169.144:443?encryption=none&flow=xtls-rprx-vision&fp=firefox&pbk=6PJlXT9xrgJP8RXfhpWDMKPh4eqGt_IZmenc_a6v0gg&security=reality&sni=gemsubbgem.world&type=tcp#%F0%9F%87%BA%F0%9F%87%B8%20US%20%7C%20Gemini%20OK%20%7C%20475ms%20%7C%20%231
-vless://50a87e21-f0e2-4b53-a787-91adfe748f63@sundaylanzgem.site:443?encryption=none&flow=xtls-rprx-vision&pbk=-BN9yCN0ECqxOPoJOan1-CIMEYc5e7wdJwaeDxsUM20&security=reality&sni=sundaylanzgem.site&type=tcp&fp=ios#%F0%9F%87%BA%F0%9F%87%B8%20US%20%7C%20Gemini%20OK%20%7C%20482ms%20%7C%20%232
-vless://e75ad2eb-6c1f-45ce-8023-f5f10875df66@86.107.179.250:443?encryption=none&flow=xtls-rprx-vision&fp=firefox&pbk=8ekBZQk5UXxYvELwhchzklwJ5H9-W3rkZ1eAVVF1xlI&security=reality&sid=b39ae58a4dcff57d&sni=edge-5c4a0a8e13a6.eu-cdn391.com&type=tcp#%F0%9F%87%AA%F0%9F%87%BA%20EU%20%7C%20Gemini%20OK%20%7C%202689ms%20%7C%20%233
