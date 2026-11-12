@@ -5,6 +5,13 @@ echo [%DATE% %TIME%] Запуск сканирования... >> scan_log.txt
 
 "C:\Users\Nitro\AppData\Local\Programs\Python\Python314\python.exe" main_2.py >> scan_log.txt 2>&1
 
+:: Защита: если sub.txt меньше 1200 байт (меньше 4 серверов), не перезаписываем подписку на GitHub
+for %%I in (sub.txt) do set SIZE=%%~zI
+if %SIZE% LSS 1200 (
+    echo [%DATE% %TIME%] ОШИБКА: Найдено слишком мало серверов (%SIZE% байт), отмена отправки на GitHub. >> scan_log.txt
+    exit /b 1
+)
+
 git pull origin main >> scan_log.txt 2>&1
 git add sub.txt sub_base64.txt >> scan_log.txt 2>&1
 git diff-index --quiet HEAD || git commit -m "Auto-update Gemini working servers (Local Scan)" >> scan_log.txt 2>&1
