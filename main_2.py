@@ -14,16 +14,36 @@ import aiohttp
 warnings.filterwarnings("ignore")
 
 SOURCES = [
+    # Пакеты обхода белых списков whoahaow/rjsxrd
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-all.txt",
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-1.txt",
     "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-2.txt",
-    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/default/all-secure.txt",
+    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-3.txt",
+    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-4.txt",
+    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-5.txt",
+    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-6.txt",
+    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-7.txt",
+    "https://raw.githubusercontent.com/whoahaow/rjsxrd/refs/heads/main/githubmirror/bypass/bypass-8.txt",
+    # Живое зеркало goida-vpn-configs (aneek0) и Hidashimora
+    "https://raw.githubusercontent.com/aneek0/goida-vpn-configs/refs/heads/main/githubmirror/26.txt",
+    "https://raw.githubusercontent.com/aneek0/goida-vpn-configs/refs/heads/main/githubmirror/1.txt",
+    "https://raw.githubusercontent.com/aneek0/goida-vpn-configs/refs/heads/main/githubmirror/6.txt",
+    "https://raw.githubusercontent.com/aneek0/goida-vpn-configs/refs/heads/main/githubmirror/22.txt",
+    "https://raw.githubusercontent.com/aneek0/goida-vpn-configs/refs/heads/main/githubmirror/25.txt",
+    "https://raw.githubusercontent.com/Hidashimora/free-vpn-anti-rkn/main/configs/26.1.txt",
+    "https://raw.githubusercontent.com/Hidashimora/free-vpn-anti-rkn/main/configs/30.txt",
+    # Проверенные агрегаторы под РФ
+    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-SNI-RU-all.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/RU_Best/ru_white_part1.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/RU_Best/ru_white_part2.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/RU_Best/ru_white_part3.txt",
+    "https://raw.githubusercontent.com/solovyov-jenya2004/all_subs/refs/heads/main/final_sorted",
+    "https://raw.githubusercontent.com/wlunlocker/vpn-configs/main/whitelist_all.txt",
+    "https://raw.githubusercontent.com/ByeWhiteLists/ByeWhiteLists2/refs/heads/main/ByeWhiteLists2.txt",
+    "https://raw.githubusercontent.com/prominbro/KfWL/refs/heads/main/KfWL.txt",
     "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_universal.txt",
-    "https://raw.githubusercontent.com/zieng2/wl/refs/heads/main/vless_lite.txt",
     "https://raw.githubusercontent.com/AirLinkVPN1/AirLinkVPN/main/rkn_white_list",
-    "https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/refs/heads/main/githubmirror/26.txt",
-    "https://raw.githubusercontent.com/AvenCores/goida-vpn-configs/refs/heads/main/githubmirror/1.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS.txt",
+    # Международные базы VLESS Reality
     "https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/refs/heads/main/Config/vless.txt",
     "https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vless.txt",
     "https://raw.githubusercontent.com/hiztin/VLESS-PO-GRIBI/main/deploy/subscriptions/1.txt",
@@ -37,13 +57,16 @@ SOURCES = [
 GLOBAL_DEADLINE_SECONDS = 900
 MAX_SERVERS_IN_SUB = 35
 MAX_PING_MS = 6500
-MAX_PER_SOURCE = 120
+MAX_PER_SOURCE = 180
+MAX_TOTAL_TCP_NODES = 2000
+MAX_KEYS_PER_IP = 2
 
 TCP_CONCURRENCY = 80
 TCP_TIMEOUT = 2.2
-MAX_CANDIDATES_FOR_XRAY = 300
-XRAY_BATCH_SIZE = 10
-STAGGER_DELAY_SEC = 0.25
+MAX_CANDIDATES_FOR_XRAY = 420
+XRAY_BATCH_SIZE = 12
+PING_CONCURRENCY_IN_BATCH = 5
+GEMINI_CONCURRENCY_IN_BATCH = 2
 BASE_LOCAL_PORT = 20000
 
 DEBUG_LOG_FILE = "debug_report.log"
@@ -54,7 +77,6 @@ GOOGLE_LOC_RE = re.compile(r',2,1,200,"([A-Z]{3})"')
 
 VALID_FPS = {"chrome", "firefox", "safari", "ios", "android", "edge", "360", "qq", "random"}
 
-# Отсекаем Cloudflare и российские облака (Yandex Cloud), где Gemini заблокирован по IP
 IGNORED_NETS = [
     ipaddress.ip_network("104.16.0.0/12"),
     ipaddress.ip_network("172.64.0.0/13"),
@@ -135,7 +157,7 @@ def is_valid_reality_pbk(pbk: str) -> bool:
 def is_valid_domain_or_ip(val: str) -> bool:
     if not val or val == "0.0.0.0" or len(val) > 253 or " " in val:
         return False
-    return bool(re.match(r"^[A-Za-z0-9.-]+$", val))
+    return bool(re.match(r"^[A-Za-z0-9._-]+$", val))
 
 
 def guess_country_from_remark(remark: str) -> str:
@@ -172,11 +194,11 @@ def parse_proxy_uri(uri: str, from_cache: bool = False) -> dict | None:
             return None
 
         net_type = params.get("type", ["tcp"])[0].lower()
-        if net_type not in ("tcp", "raw", "grpc"):
+        if net_type not in ("tcp", "raw", "grpc", "ws", "httpupgrade"):
             return None
 
         flow = params.get("flow", [""])[0]
-        if net_type == "grpc" or flow not in ("xtls-rprx-vision", "xtls-rprx-vision-udp443"):
+        if net_type in ("grpc", "ws", "httpupgrade") or flow not in ("xtls-rprx-vision", "xtls-rprx-vision-udp443"):
             flow = ""
 
         fp = params.get("fp", ["chrome"])[0].lower()
@@ -187,8 +209,9 @@ def parse_proxy_uri(uri: str, from_cache: bool = False) -> dict | None:
         spx = params.get("spx", ["/"])[0].strip()
         has_ru = any(m in sni.lower() for m in RU_WHITELIST_MARKERS)
 
+        actual_net = "tcp" if net_type in ("tcp", "raw") else net_type
         stream_settings = {
-            "network": "grpc" if net_type == "grpc" else "tcp",
+            "network": actual_net,
             "security": "reality",
             "realitySettings": {
                 "show": False,
@@ -200,9 +223,17 @@ def parse_proxy_uri(uri: str, from_cache: bool = False) -> dict | None:
             },
         }
 
-        if net_type == "grpc":
+        if actual_net == "grpc":
             service_name = params.get("serviceName", [""])[0].strip()
             stream_settings["grpcSettings"] = {"serviceName": service_name}
+        elif actual_net == "ws":
+            path = params.get("path", ["/"])[0].strip()
+            ws_host = params.get("host", [sni])[0].strip()
+            stream_settings["wsSettings"] = {"path": path, "headers": {"Host": ws_host}}
+        elif actual_net == "httpupgrade":
+            path = params.get("path", ["/"])[0].strip()
+            hu_host = params.get("host", [sni])[0].strip()
+            stream_settings["httpupgradeSettings"] = {"path": path, "host": hu_host}
         else:
             stream_settings["tcpSettings"] = {"header": {"type": "none"}}
 
@@ -229,7 +260,8 @@ def parse_proxy_uri(uri: str, from_cache: bool = False) -> dict | None:
             "port": int(port),
             "whitelist_sni": has_ru,
             "from_cache": from_cache,
-            "key": f"vless:{host.lower()}:{port}",
+            "key": f"vless:{host.lower()}:{port}:{uuid}:{pbk}:{sid}",
+            "host_port": f"{host.lower()}:{port}",
             "remark": remark,
             "outbound": outbound,
         }
@@ -312,6 +344,11 @@ async def fetch_one_source(session: aiohttp.ClientSession, url: str) -> tuple[st
 
 async def fetch_sources(initial_nodes: dict[str, dict]) -> list[dict]:
     nodes = dict(initial_nodes)
+    host_counts = {}
+    for n in nodes.values():
+        hp = n["host_port"]
+        host_counts[hp] = host_counts.get(hp, 0) + 1
+
     headers = {"User-Agent": "Mozilla/5.0"}
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15), headers=headers) as session:
         results = await asyncio.gather(*(fetch_one_source(session, url) for url in SOURCES))
@@ -320,14 +357,18 @@ async def fetch_sources(initial_nodes: dict[str, dict]) -> list[dict]:
             for parsed in parsed_list:
                 if added >= MAX_PER_SOURCE:
                     break
-                if parsed["key"] not in nodes:
+                hp = parsed["host_port"]
+                if parsed["key"] not in nodes and host_counts.get(hp, 0) < MAX_KEYS_PER_IP:
                     nodes[parsed["key"]] = parsed
+                    host_counts[hp] = host_counts.get(hp, 0) + 1
                     added += 1
             if status == 200:
                 log_debug(f"[SOURCE] OK (+{added} новых Reality) -> {url}")
             elif status != 0:
                 log_debug(f"[SOURCE] HTTP {status} -> {url}")
-    return list(nodes.values())
+
+    all_nodes = list(nodes.values())
+    return all_nodes[:MAX_TOTAL_TCP_NODES]
 
 
 async def check_tcp(node: dict, sem: asyncio.Semaphore) -> dict | None:
@@ -350,11 +391,9 @@ async def check_tcp(node: dict, sem: asyncio.Semaphore) -> dict | None:
             return None
 
 
-def test_tunnel_curl(local_port: int) -> tuple[bool, int, str, str]:
+def curl_ping_204(local_port: int) -> tuple[bool, int, str]:
     proxy_url = f"http://127.0.0.1:{local_port}"
     t0 = time.monotonic()
-
-    # Этап 1: Быстрый отсев мертвых туннелей через легкий generate_204
     cmd_ping = [
         "curl.exe", "-s", "-o", "NUL",
         "-x", proxy_url,
@@ -366,62 +405,83 @@ def test_tunnel_curl(local_port: int) -> tuple[bool, int, str, str]:
     try:
         res_ping = subprocess.run(cmd_ping, capture_output=True, text=True, timeout=6.5)
         if res_ping.returncode != 0:
-            return False, 0, "", f"Curl 204 Ошибка (Код {res_ping.returncode})"
+            return False, 0, f"Curl 204 Ошибка (Код {res_ping.returncode})"
         if res_ping.stdout.strip() not in ("204", "200"):
-            return False, 0, "", f"Google 204 Неверный ответ ({res_ping.stdout.strip()})"
+            return False, 0, f"Google 204 Неверный ответ ({res_ping.stdout.strip()})"
+        ping_ms = int((time.monotonic() - t0) * 1000)
+        if ping_ms > MAX_PING_MS:
+            return False, 0, f"Высокий пинг ({ping_ms}ms > {MAX_PING_MS}ms)"
+        return True, ping_ms, ""
     except subprocess.TimeoutExpired:
-        return False, 0, "", "Google 204 Таймаут"
+        return False, 0, "Google 204 Таймаут"
     except Exception as e:
-        return False, 0, "", f"Google 204 Ошибка ({type(e).__name__})"
+        return False, 0, f"Google 204 Ошибка ({type(e).__name__})"
 
-    ping_ms = int((time.monotonic() - t0) * 1000)
-    if ping_ms > MAX_PING_MS:
-        return False, 0, "", f"Высокий пинг ({ping_ms}ms > {MAX_PING_MS}ms)"
 
-    # Этап 2: Проверка доступности самого Gemini для живого туннеля
+def curl_check_gemini(local_port: int) -> tuple[bool, str, str]:
+    proxy_url = f"http://127.0.0.1:{local_port}"
     cmd_gem = [
-        "curl.exe", "-sL",
+        "curl.exe", "-sL", "--http1.1",
         "-x", proxy_url,
-        "--connect-timeout", "4.5",
-        "--max-time", "8.5",
+        "--connect-timeout", "6.0",
+        "--max-time", "12.0",
         "-H", "Accept-Language: en-US,en;q=0.9",
         "-w", "\n__META__:%{http_code}|%{url_effective}",
         "https://gemini.google.com/",
     ]
-    try:
-        res_gem = subprocess.run(cmd_gem, capture_output=True, text=True, timeout=10.0)
-        if res_gem.returncode != 0:
-            return False, 0, "", f"Gemini Curl Ошибка (Код {res_gem.returncode})"
+    last_err = ""
+    # Делаем до 2 попыток для серверов, которые уже прошли generate_204
+    for attempt in range(2):
+        try:
+            res_gem = subprocess.run(cmd_gem, capture_output=True, text=True, timeout=13.5)
+            if res_gem.returncode != 0:
+                last_err = f"Gemini Curl Ошибка (Код {res_gem.returncode})"
+                continue
 
-        out = res_gem.stdout
-        if "__META__:" not in out:
-            return False, 0, "", "Gemini Ошибка: Пустой ответ"
+            out = res_gem.stdout
+            if "__META__:" not in out:
+                last_err = "Gemini Ошибка: Пустой ответ"
+                continue
 
-        body, meta = out.rsplit("__META__:", 1)
-        code, final_url = meta.strip().split("|", 1)
-        final_url_low = final_url.lower()
+            body, meta = out.rsplit("__META__:", 1)
+            code, final_url = meta.strip().split("|", 1)
+            final_url_low = final_url.lower()
 
-        if code != "200" or any(b in final_url_low for b in ("/faq", "sorry", "policies", "unsupported")):
-            return False, 0, "", f"Gemini Блок: HTTP {code} (URL: {final_url_low})"
-        if '"45631641":false' in body or "[45631641,null,false" in body:
-            return False, 0, "", "Gemini Блок: Регион недоступен"
+            if code != "200" or any(b in final_url_low for b in ("/faq", "sorry", "policies", "unsupported")):
+                return False, "", f"Gemini Блок: HTTP {code} (URL: {final_url_low})"
+            if '"45631641":false' in body or "[45631641,null,false" in body:
+                return False, "", "Gemini Блок: Регион недоступен"
 
-        loc_match = GOOGLE_LOC_RE.search(body)
-        iso3 = loc_match.group(1) if loc_match else ""
-        if iso3 in BLOCKED_ISO3:
-            return False, 0, "", f"Gemini Блок: Изолированный регион ({iso3})"
+            loc_match = GOOGLE_LOC_RE.search(body)
+            iso3 = loc_match.group(1) if loc_match else ""
+            if iso3 in BLOCKED_ISO3:
+                return False, "", f"Gemini Блок: Изолированный регион ({iso3})"
 
-        return True, ping_ms, ISO3_TO_ISO2.get(iso3, ""), ""
-    except subprocess.TimeoutExpired:
-        return False, 0, "", "Gemini Запрос: Таймаут"
-    except Exception as e:
-        return False, 0, "", f"Gemini Системная ошибка ({type(e).__name__})"
+            return True, ISO3_TO_ISO2.get(iso3, ""), ""
+        except subprocess.TimeoutExpired:
+            last_err = "Gemini Запрос: Таймаут"
+        except Exception as e:
+            last_err = f"Gemini Системная ошибка ({type(e).__name__})"
+    return False, "", last_err
 
 
-async def staggered_curl_check(loop: asyncio.AbstractEventLoop, idx: int, port: int):
-    if idx > 0:
-        await asyncio.sleep(idx * STAGGER_DELAY_SEC)
-    return await loop.run_in_executor(None, test_tunnel_curl, port)
+async def evaluate_node_in_batch(
+    loop: asyncio.AbstractEventLoop,
+    port: int,
+    ping_sem: asyncio.Semaphore,
+    gem_sem: asyncio.Semaphore,
+) -> tuple[bool, int, str, str]:
+    async with ping_sem:
+        ok_ping, ping_ms, err_ping = await loop.run_in_executor(None, curl_ping_204, port)
+    if not ok_ping:
+        return False, 0, "", err_ping
+
+    async with gem_sem:
+        ok_gem, country, err_gem = await loop.run_in_executor(None, curl_check_gemini, port)
+    if not ok_gem:
+        return False, 0, "", err_gem
+
+    return True, ping_ms, country, ""
 
 
 async def run_xray_batch(batch: list[dict], base_port: int, stop_event: asyncio.Event) -> list[dict]:
@@ -467,8 +527,11 @@ async def run_xray_batch(batch: list[dict], base_port: int, stop_event: asyncio.
     if proc.poll() is None:
         try:
             loop = asyncio.get_running_loop()
+            ping_sem = asyncio.Semaphore(PING_CONCURRENCY_IN_BATCH)
+            gem_sem = asyncio.Semaphore(GEMINI_CONCURRENCY_IN_BATCH)
+
             tasks = [
-                staggered_curl_check(loop, idx, base_port + idx)
+                evaluate_node_in_batch(loop, base_port + idx, ping_sem, gem_sem)
                 for idx in range(len(batch))
             ]
             results = await asyncio.gather(*tasks)
@@ -534,19 +597,16 @@ async def main():
     sem = asyncio.Semaphore(TCP_CONCURRENCY)
     raw_alive = [n for n in await asyncio.gather(*(check_tcp(n, sem) for n in nodes)) if n and not is_ignored_ip(n.get("ip", ""))]
 
-    # Дедупликация по реальному IP:PORT, чтобы зеркала одного сервера не забивали очередь
-    seen_ip_ports = set()
+    ip_counts = {}
     alive = []
     for n in sorted(raw_alive, key=lambda x: (0 if x.get("from_cache") else 1, x["tcp_ms"])):
         ip_port = f"{n.get('ip', n['host'])}:{n['port']}"
-        if ip_port not in seen_ip_ports:
-            seen_ip_ports.add(ip_port)
+        if ip_counts.get(ip_port, 0) < MAX_KEYS_PER_IP:
+            ip_counts[ip_port] = ip_counts.get(ip_port, 0) + 1
             alive.append(n)
 
-    print(f"[+] Ответили по TCP (уникальных IP): {len(alive)} серверов")
-
-    # Пауза 2 секунды, чтобы роутер закрыл TCP-сокеты перед запуском Xray
-    await asyncio.sleep(2.0)
+    print(f"[+] Ответили по TCP: {len(alive)} серверов")
+    await asyncio.sleep(1.5)
 
     alive.sort(key=lambda x: (
         0 if x.get("from_cache") else 1,
@@ -556,7 +616,7 @@ async def main():
     ))
     candidates = alive[:MAX_CANDIDATES_FOR_XRAY]
 
-    print("[*] 3. Параллельная проверка кандидатов через Xray + curl...")
+    print("[*] 3. Двухэтапная проверка кандидатов через Xray + curl...")
     working_nodes = []
 
     for i in range(0, len(candidates), XRAY_BATCH_SIZE):
@@ -570,13 +630,21 @@ async def main():
     if working_nodes:
         save_cached_nodes(working_nodes, cached_nodes)
 
-    working_nodes.sort(key=lambda x: (
+    # Убираем дубликаты по IP из финальной выдачи, оставляя самый быстрый ключ
+    unique_working = {}
+    for n in sorted(working_nodes, key=lambda x: x["gemini_ms"]):
+        ip_key = f"{n.get('ip', n['host'])}:{n['port']}"
+        if ip_key not in unique_working:
+            unique_working[ip_key] = n
+
+    final_nodes = list(unique_working.values())
+    final_nodes.sort(key=lambda x: (
         0 if x["whitelist_sni"] else 1,
         0 if x["exit_country"] == "US" else (1 if x["exit_country"] in ("GB", "NL", "DE", "FI", "SE") else 2),
         x["gemini_ms"],
     ))
 
-    top_nodes = working_nodes[:MAX_SERVERS_IN_SUB]
+    top_nodes = final_nodes[:MAX_SERVERS_IN_SUB]
     final_uris = []
     for idx, n in enumerate(top_nodes, 1):
         cc, ms = n["exit_country"], n["gemini_ms"]
